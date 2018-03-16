@@ -3,6 +3,21 @@ socket.on('connect', function (){
     console.log('connected to server');
 });
 
+function scroll2Bottom(){
+    //selectors
+    var msgs = jQuery('#msgRecd');
+    var newMsg = msgs.children('li:last-child');
+    //heights
+    var clientHt = msgs.prop('clientHeight');
+    var scrollTop = msgs.prop('scrollTop');
+    var newMsgHt = newMsg.innerHeight();
+    var lastMsgHt = newMsg.prev().innerHeight();
+    var scrollHt = msgs.prop('scrollHeight');
+    if ((clientHt + scrollTop + newMsgHt + lastMsgHt)>=scrollHt){
+        msgs.scrollTop(scrollHt);
+    }
+}
+
 socket.on('disconnect', function (){
     console.log('disconnected from server');
 });
@@ -12,6 +27,7 @@ socket.on('newMsg', function(msg){
     var template= jQuery('#msgTemplate').html();
     var html=Mustache.render(template, {text:msg.text, from: msg.from, created: formatTime});
     jQuery('#msgRecd').append(html);
+    scroll2Bottom();
     // var li = jQuery('<li></li>');
     // li.text(`${msg.from} ${formatTime}: ${msg.text}`);
     // jQuery('#msgRecd').append(li);
@@ -22,6 +38,7 @@ socket.on('newLocMsg', function (msg){
     var template= jQuery('#msgLocTemplate').html();
     var html=Mustache.render(template, {url:msg.url, from: msg.from, created: formatTime});
     jQuery('#msgRecd').append(html);
+    scroll2Bottom();
 });
 
 var msgInput=jQuery('[name=msg]')
