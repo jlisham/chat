@@ -9,19 +9,19 @@ socket.on('disconnect', function (){
 
 socket.on('newMsg', function(msg){
     var formatTime = moment(msg.created).format('h:mm a');
-    var li = jQuery('<li></li>');
-    li.text(`${msg.from} ${formatTime}: ${msg.text}`);
-    jQuery('#msgRecd').append(li);
+    var template= jQuery('#msgTemplate').html();
+    var html=Mustache.render(template, {text:msg.text, from: msg.from, created: formatTime});
+    jQuery('#msgRecd').append(html);
+    // var li = jQuery('<li></li>');
+    // li.text(`${msg.from} ${formatTime}: ${msg.text}`);
+    // jQuery('#msgRecd').append(li);
 });
 
 socket.on('newLocMsg', function (msg){
     var formatTime = moment(msg.created).format('h:mm a');
-    var li = jQuery('<li></li>');
-    var a = jQuery(" <a target='_blank'>curr loc</a>");
-    li.text(`${msg.from} ${formatTime}: `);
-    a.attr('href', msg.url);
-    li.append(a);
-    jQuery('#msgRecd').append(li);
+    var template= jQuery('#msgLocTemplate').html();
+    var html=Mustache.render(template, {url:msg.url, from: msg.from, created: formatTime});
+    jQuery('#msgRecd').append(html);
 });
 
 var msgInput=jQuery('[name=msg]')
