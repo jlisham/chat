@@ -2,7 +2,7 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
-const {generateMsg, createLocMsg} = require('./utils/message');
+const {generateMsg, generateLocMsg} = require('./utils/message');
 const {isRealStr} = require('./utils/validation');
 const {Users} = require('./utils/users');
 
@@ -40,14 +40,19 @@ io.on('connection', (socket) =>{
     });
 
     socket.on('createMsg', (msg, callback) => {
-        console.log('createMsg', msg);
-        io.emit('newMsg', generateMsg(msg.from, msg.text));
+        var user = users.getUser(socket.id);
+        if (user && isRealStr(msg.text)){
+            io.to(user.room).emit('newMsg', generateMsg(user.name, msg.text));            
+        }
         callback('call and response');
         // socket.broadcast.emit('newMsg',generateMsg(msg.from, msg.text));
     });
 
     socket.on('createLocMsg', (coords) => {
-        io.emit('newLocMsg', generateLocMsg(params.name, coords.lat, coords.lon));
+        var user = users.getUser(socket.id);
+        if (user){
+            io.to(user.room).emit('newLocMsg', generateLocMsg(user.name, coords.lat, coords.lon));           
+        }
     });
 
     socket.on('disconnect', () =>{
